@@ -98,7 +98,7 @@ threshold_value = 0
 winner_number = 3
 
 
-train_times = 15000
+train_times = 50000
 
 # ----------------------------------set parameters---------------------------------------
 set_para()
@@ -158,6 +158,7 @@ y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmo
 
 
 y_transformed = tf.math.sigmoid(10 * (y_pred[:,0,0] -  y_pred[:,1,0]))
+y_transformed = tf.reshape(y_transformed, shape=(-1,1))
 
 
 # loss_1 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[:,0,0], logits=y_pred[:,0,0])
@@ -242,7 +243,7 @@ sess.run(tf.global_variables_initializer())
 #     y_true    : train_label
 # }
 
-for i in range(train_times * positive_data.shape[0]):
+for i in range(train_times):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
     train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
     train_data = np.array(train_data).reshape((-1,2,single_input_size))
@@ -255,10 +256,10 @@ for i in range(train_times * positive_data.shape[0]):
 
     }
 
-    cost_val, true_label, pred_label, opt_obj, loss_all_value = sess.run( [cost, y_true, y_pred, optimizer, loss_all], feed_dict=feed_dict_train )
+    cost_val, true_label, pred_label, opt_obj = sess.run( [cost, y_true, y_pred,
+        optimizer], feed_dict=feed_dict_train )
     if (i % 1000) == 0 :
         print('epoch: {0} cost = {1}'.format(i,cost_val))
-        print('loss all is {}'.format(loss_all_value))
 #             print(pred_label)
 #             print(true_label)
 # print(pred_label)
