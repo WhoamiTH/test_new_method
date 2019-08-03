@@ -251,6 +251,7 @@ for i in range(train_times * positive_data.shape[0]):
     cost_val, true_label, pred_label, opt_obj, loss_all_value = sess.run( [cost, y_true, y_pred, optimizer, loss_all], feed_dict=feed_dict_train )
     if (i % 1000) == 0 :
         print('epoch: {0} cost = {1}'.format(i,cost_val))
+        print('loss all is {}'.format(loss_all_value))
 #             print(pred_label)
 #             print(true_label)
 print(pred_label)
