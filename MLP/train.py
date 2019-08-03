@@ -97,6 +97,9 @@ negative_value = -1
 threshold_value = 0
 winner_number = 3
 
+
+train_times = 15000
+
 # ----------------------------------set parameters---------------------------------------
 set_para()
 
@@ -225,7 +228,7 @@ sess.run(tf.global_variables_initializer())
 #     y_true    : train_label
 # }
 
-for i in range(15000):
+for i in range(train_times * positive_data.shape[0]):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
     feed_dict_train = {
         x       : train_data,
@@ -233,7 +236,7 @@ for i in range(15000):
     }
 
     cost_val, true_label, pred_label, opt_obj = sess.run( [cost, y_true, y_pred, optimizer], feed_dict=feed_dict_train )
-    if (i % 100) == 0 :
+    if (i % 1000) == 0 :
         print('epoch: {0} cost = {1}'.format(i,cost_val))
 #             print(pred_label)
 #             print(true_label)
