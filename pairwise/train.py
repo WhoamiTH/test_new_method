@@ -9,6 +9,7 @@ import handle_data
 import predict_test
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 
 def train_model(train_data, train_label):
     start = clock()

@@ -9,6 +9,7 @@ import handle_data
 import predict_test
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 
 def set_para():
     global file_name
