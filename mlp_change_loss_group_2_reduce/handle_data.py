@@ -40,7 +40,47 @@ def loadTestData(file_name):
     data = pd.DataFrame(data)
     return file_data, data
 
-def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_length=1):
+# def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_length=1):
+#     x_examples = []
+#     y_examples = []
+#     t_examples = []
+#     # print(train_data) 
+#     # print(group_index_list)
+#     group_list_length = len(group_index_list)
+#     # print(train_data.shape)
+
+#     # for i in range(batch_size):
+#     group_idx = random.randint(0, group_list_length-1)
+#     group_index = group_index_list[group_idx]
+#     # print(group_index)
+
+#     current_group_data = train_data[group_index]
+#     current_group_label = train_label[group_index]
+
+#     positive_data, negative_data = divide_data(current_group_data, current_group_label)
+#     positive_length = positive_data.shape[0]
+#     negative_length = negative_data.shape[0]
+    
+#     posi_or_nega = random.randint(0, 1)
+#     if posi_or_nega > 0:
+#         positive_idx = random.randint(0, positive_length - seq_length)
+#         x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
+#         y_examples.append([1])
+#         negative_idx = random.randint(0, negative_length - seq_length)
+#         x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
+#         y_examples.append([0])
+#         t_examples.append([1])
+#     else:
+#         negative_idx = random.randint(0, negative_length - seq_length)
+#         x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
+#         y_examples.append([0])
+#         positive_idx = random.randint(0, positive_length - seq_length)
+#         x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
+#         y_examples.append([1])
+#         t_examples.append([0])
+#     return x_examples, y_examples, t_examples
+
+def next_batch(train_data, train_label, group_index_list, batch_size=1000, pairsize=2, seq_length=1):
     x_examples = []
     y_examples = []
     t_examples = []
@@ -49,35 +89,35 @@ def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_leng
     group_list_length = len(group_index_list)
     # print(train_data.shape)
 
-    # for i in range(batch_size):
-    group_idx = random.randint(0, group_list_length-1)
-    group_index = group_index_list[group_idx]
-    # print(group_index)
+    for i in range(batch_size):
+        group_idx = random.randint(0, group_list_length-1)
+        group_index = group_index_list[group_idx]
+        # print(group_index)
 
-    current_group_data = train_data[group_index]
-    current_group_label = train_label[group_index]
+        current_group_data = train_data[group_index]
+        current_group_label = train_label[group_index]
 
-    positive_data, negative_data = divide_data(current_group_data, current_group_label)
-    positive_length = positive_data.shape[0]
-    negative_length = negative_data.shape[0]
-    
-    posi_or_nega = random.randint(0, 1)
-    if posi_or_nega > 0:
-        positive_idx = random.randint(0, positive_length - seq_length)
-        x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
-        y_examples.append([1])
-        negative_idx = random.randint(0, negative_length - seq_length)
-        x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
-        y_examples.append([0])
-        t_examples.append([1])
-    else:
-        negative_idx = random.randint(0, negative_length - seq_length)
-        x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
-        y_examples.append([0])
-        positive_idx = random.randint(0, positive_length - seq_length)
-        x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
-        y_examples.append([1])
-        t_examples.append([0])
+        positive_data, negative_data = divide_data(current_group_data, current_group_label)
+        positive_length = positive_data.shape[0]
+        negative_length = negative_data.shape[0]
+        
+        posi_or_nega = random.randint(0, 1)
+        if posi_or_nega > 0:
+            positive_idx = random.randint(0, positive_length - seq_length)
+            x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
+            y_examples.append([1])
+            negative_idx = random.randint(0, negative_length - seq_length)
+            x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
+            y_examples.append([0])
+            t_examples.append([1])
+        else:
+            negative_idx = random.randint(0, negative_length - seq_length)
+            x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
+            y_examples.append([0])
+            positive_idx = random.randint(0, positive_length - seq_length)
+            x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
+            y_examples.append([1])
+            t_examples.append([0])
     return x_examples, y_examples, t_examples
 
 
