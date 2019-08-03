@@ -134,13 +134,13 @@ train_data = new_data
 batch_size = 50
 
 
-# positive_data, negative_data = handle_data.divide_data(train_data, label)
+positive_data, negative_data = handle_data.divide_data(train_data, label)
 
 # create LogisticRegression model
 
 
 single_input_size = train_data.shape[1]
-# transformed_input_size = 2 * single_input_size
+transformed_input_size = 2 * single_input_size
 
 
 num_class = 1
@@ -151,9 +151,9 @@ y_true = tf.placeholder(tf.float32, [None, num_class])
 
 
 # one hidden layer ------------------------------------------------
-hidden1 = tf.layers.dense(inputs=x, units=2*single_input_size, use_bias=True, activation=tf.nn.relu)
-# y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
-y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmoid)
+# hidden1 = tf.layers.dense(inputs=x, units=2*single_input_size, use_bias=True, activation=tf.nn.relu)
+# # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
+# y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmoid)
 
 # two hidden layer ------------------------------------------------
 # hidden1 = tf.layers.dense(inputs=x, units=2*transformed_input_size, use_bias=True, activation=tf.nn.sigmoid)
@@ -189,15 +189,15 @@ y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmo
 # y_pred = tf.layers.dense(inputs=hidden4, units=num_class, activation=tf.nn.sigmoid)
 
 # 8 hidden layers -----------------------------------------------------------
-# hidden1 = tf.layers.dense(inputs=x, units=4*transformed_input_size, use_bias=True, activation=tf.nn.relu)
-# hidden2 = tf.layers.dense(inputs=hidden1, units=3*transformed_input_size, use_bias=True, activation=tf.nn.relu)
-# hidden3 = tf.layers.dense(inputs=hidden2, units=2*transformed_input_size, use_bias=True, activation=tf.nn.relu)
-# hidden4 = tf.layers.dense(inputs=hidden3, units=transformed_input_size, use_bias=True, activation=tf.nn.relu)
-# hidden5 = tf.layers.dense(inputs=hidden4, units=single_input_size, use_bias=True, activation=tf.nn.relu)
-# hidden6 = tf.layers.dense(inputs=hidden5, units=4*num_class, use_bias=True, activation=tf.nn.relu)
-# hidden7 = tf.layers.dense(inputs=hidden6, units=2*num_class, use_bias=True, activation=tf.nn.relu)
-# # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
-# y_pred = tf.layers.dense(inputs=hidden7, units=num_class, activation=tf.nn.sigmoid)
+hidden1 = tf.layers.dense(inputs=x, units=4*transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden2 = tf.layers.dense(inputs=hidden1, units=3*transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden3 = tf.layers.dense(inputs=hidden2, units=2*transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden4 = tf.layers.dense(inputs=hidden3, units=transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden5 = tf.layers.dense(inputs=hidden4, units=single_input_size, use_bias=True, activation=tf.nn.relu)
+hidden6 = tf.layers.dense(inputs=hidden5, units=4*num_class, use_bias=True, activation=tf.nn.relu)
+hidden7 = tf.layers.dense(inputs=hidden6, units=2*num_class, use_bias=True, activation=tf.nn.relu)
+# y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
+y_pred = tf.layers.dense(inputs=hidden7, units=num_class, activation=tf.nn.sigmoid)
 
 
 
@@ -228,7 +228,7 @@ sess.run(tf.global_variables_initializer())
 #     y_true    : train_label
 # }
 
-for i in range(train_times * positive_data.shape[0]):
+for i in range(train_times):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
     feed_dict_train = {
         x       : train_data,
