@@ -123,7 +123,7 @@ train_data = new_data
 
 
 
-reference_train_data,reference_train_label = handle_data.transform_data_to_compare_data(train_data, label, dicstart, diclength, mirror_type, positive_value, negative_value)
+reference_train_data,reference_train_label = handle_data.transform_data_to_compare_data(train_data, label, group_index_list, mirror_type, positive_value, negative_value)
 
 
 reference_transformed_input_size = reference_train_data.shape[1]

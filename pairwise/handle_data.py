@@ -305,20 +305,18 @@ def handleData_extend_not_mirror(Data, Label, positive_value, negative_value):
     return temd, teml
 
 
-def transform_data_to_compare_data(Data, Label, Ds, Dl, mirror_type, positive_value, negative_value):
+def transform_data_to_compare_data(Data, Label, group_index_list, mirror_type, positive_value, negative_value):
     tem_data = []
     tem_label = []
-    for group_index in range(len(Ds)):
-        group_start = Ds[group_index]
-        length = Dl[group_index]
-        current_group_data = Data[group_start:group_start+length,:]
-        current_group_label = Label[group_start:group_start+length]
+    for group_index in group_index_list:
+        current_group_data = Data[group_index]
+        current_group_label = Label[group_index]
         if mirror_type == 'mirror':
             temd, teml = handleData_extend_mirror(current_group_data, current_group_label, positive_value, negative_value)
         else:
             temd, teml = handleData_extend_not_mirror(current_group_data, current_group_label, positive_value, negative_value)
-        tem_data = tem_data + temd
-        tem_label = tem_label + teml
+        tem_data.extend(temd)
+        tem_label.extend(teml)
 
     data = np.array(tem_data)
     label = np.array(tem_label)
