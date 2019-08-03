@@ -9,6 +9,7 @@ from sklearn.externals import joblib
 import pandas as pd
 
 
+
 # handle data function begining
 
 def loadTrainData(file_name):
@@ -39,16 +40,23 @@ def loadTestData(file_name):
     data = pd.DataFrame(data)
     return file_data, data
 
-def next_batch(positive_data, negative_data, batch_size=2, seq_length=1):
+def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_length=1):
     x_examples = []
     y_examples = []
     t_examples = []
-    
-    positive_length = positive_data.shape[0]
-    negative_length = negative_data.shape[0]
 
+    group_list_length = len(group_index_list)
 
     # for i in range(batch_size):
+    group_idx = random.randint(0, group_list_length-1)
+    group_index = group_index_list[group_idx]
+
+    current_group_data = train_data[group_index]
+    current_group_label = train_label[group_index]
+
+    positive_data, negative_data = divide_data(current_group_data, current_group_label)
+
+    
     posi_or_nega = random.randint(0, 1)
     if posi_or_nega > 0:
         positive_idx = random.randint(0, positive_length - seq_length)

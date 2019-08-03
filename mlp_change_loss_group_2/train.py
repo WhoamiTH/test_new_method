@@ -238,14 +238,13 @@ gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.46)
 sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 sess.run(tf.global_variables_initializer())
 
-# feed_dict_train = {
-#     x         : train_data,
-#     y_true    : train_label
-# }
 
 for i in range(train_times):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
-    train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
+
+    # train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
+    train_data, train_label, transformed_label = handle_data.next_batch(train_data, train_label, group_index_list)
+
     train_data = np.array(train_data).reshape((-1,2,single_input_size))
     train_label = np.array(train_label).reshape((-1,2,1))
     transformed_label = np.array(transformed_label).reshape((-1,1))
