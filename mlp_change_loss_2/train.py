@@ -254,7 +254,7 @@ for i in range(train_times * positive_data.shape[0]):
         print('loss all is {}'.format(loss_all_value))
 #             print(pred_label)
 #             print(true_label)
-print(pred_label)
+# print(pred_label)
 finish = clock()
 saver.save(sess, model_name)
 
