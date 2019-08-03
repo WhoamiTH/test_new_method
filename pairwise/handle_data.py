@@ -40,7 +40,8 @@ def loadTestData(file_name):
     data = pd.DataFrame(data)
     return file_data, data
 
-def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_length=1, reference_model_name):
+def next_batch(train_data, train_label, group_index_list, reference_model_name,
+        batch_size=2, seq_length=1):
     x_examples = []
     y_examples = []
     t_examples = []
