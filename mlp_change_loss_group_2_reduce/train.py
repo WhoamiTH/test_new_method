@@ -171,17 +171,7 @@ loss_2 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_transformed_true, logi
 
 loss = loss_1 + loss_2
 
-cost_1 = tf.reduce_mean(loss_1)
-cost_2 = tf.reduce_mean(loss_2)
 
-# loss = loss_1 + loss_2
-
-
-# print(loss)
-
-# cost = tf.reduce_mean(loss)
-
-cost = cost_1 + cost_2
 # print(loss)
 
 cost = tf.reduce_mean(loss)
@@ -255,9 +245,9 @@ for i in range(train_times):
     # train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
     current_train_data, current_train_label, current_transformed_label = handle_data.next_batch(train_data, train_label, group_index_list)
 
-    train_data = np.array(train_data).reshape((-1,2,single_input_size))
-    train_label = np.array(train_label).reshape((-1,2,1))
-    transformed_label = np.array(transformed_label).reshape((-1,1))
+    current_train_data = np.array(current_train_data).reshape((-1,2,single_input_size))
+    current_train_label = np.array(current_train_label).reshape((-1,2,1))
+    current_transformed_label = np.array(current_transformed_label).reshape((-1,1))
     feed_dict_train = {
         x                   : current_train_data,
         y_true              : current_train_label,
