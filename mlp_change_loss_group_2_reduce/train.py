@@ -185,7 +185,7 @@ cost = cost_1 + cost_2
 
 # print(loss)
 
-cost = tf.reduce_mean(loss)
+# cost = tf.reduce_mean(loss)
 optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
 
 
