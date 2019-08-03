@@ -181,10 +181,10 @@ cost_2 = tf.reduce_mean(loss_2)
 
 # cost = tf.reduce_mean(loss)
 
-cost = cost_1 + cost_2
+cost_all = cost_1 + cost_2
 
 # print(loss)
-
+cost = tf.reduce_mean(cost_all)
 # cost = tf.reduce_mean(loss)
 optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
 
