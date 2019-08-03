@@ -141,8 +141,9 @@ optimizer = tf.get_collection('optimizer')[0]
 
 # general test ---------------------------------------------------------------
 
-current_test_data = handle_data.transform_data_to_test_form_data(test_data, negative_data)
-general_results = sess.run(y_pred, feed_dict={x: current_test_data})
+# current_test_data = handle_data.transform_data_to_test_form_data(test_data, negative_data)
+# general_results = sess.run(y_pred, feed_dict={x: current_test_data})
+general_results = sess.run(y_pred, feed_dict={x:test_data})
 print(general_results)
 general_pred_results = general_results[:,0].reshape(-1,1)
 
