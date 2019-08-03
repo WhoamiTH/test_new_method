@@ -134,7 +134,7 @@ train_data = new_data
 batch_size = 50
 
 
-positive_data, negative_data = handle_data.divide_data(train_data, label)
+positive_data, negative_data = handle_data.divide_data(train_data, train_label)
 
 # create LogisticRegression model
 
