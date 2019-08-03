@@ -169,7 +169,7 @@ loss_1 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true, logits=y_pred)
 
 loss_2 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_transformed_true, logits=y_transformed)
 
-loss = loss_1 + loss_2
+# loss = loss_1 + loss_2
 
 cost_1 = tf.reduce_mean(loss_1)
 cost_2 = tf.reduce_mean(loss_2)
