@@ -1,7 +1,7 @@
 import sys
 
 
-method_name = 'change_loss_all_2_reduce'
+method_name = 'change_loss_group_2_reduce'
 total_record_number = 1
 test_number = 1
 winner_number = 3
