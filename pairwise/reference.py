@@ -10,24 +10,6 @@ import predict_test
 import pandas as pd
 import numpy as np
 
-def train_model(train_data, train_label):
-    start = clock()
-    global model_type
-    if model_type == 'LR':
-        model = sklin.LogisticRegression()
-        model.fit(train_data,train_label.flatten())
-    if model_type == 'SVC':
-        model = sksvm.SVC(C=0.1,kernel='linear')
-        # model = sksvm.SVC(C=0.1,kernel='rbf')
-        # model = sksvm.SVC(C=0.1,kernel='poly')
-        model.fit(train_data, train_label.flatten())
-    if model_type == 'DT':
-        model = sktree.DecisionTreeClassifier()
-        model.fit(train_data, train_label.flatten())
-    finish = clock()
-    return model, finish-start
-
-
 def set_para():
     global file_name
     global model_record_path
@@ -43,7 +25,6 @@ def set_para():
     global pca_name
     global kernelpca_name
     global model_name
-    global reference_model_name
 
     argv = sys.argv[1:]
     for each in argv:
@@ -81,8 +62,6 @@ def set_para():
             kernelpca_name = para[1]
         if para[0] == 'model_name':
             model_name = para[1]
-        if para[0] == 'reference_model_name':
-            reference_model_name = para[1]
 
     if kernelpca_or_not and pca_or_not:
         pca_or_not = True
@@ -110,9 +89,6 @@ scaler_name = 'scaler.m'
 pca_name = 'pca.m'
 kernelpca_name = ''
 model_name = 'model.m'
-
-reference_model_name = 'reference_model'
-
 positive_value = 1
 negative_value = -1
 threshold_value = 0
@@ -131,7 +107,6 @@ if pca_or_not:
 if kernelpca_or_not:
     kernelpca_name = model_record_path  + method_name + '_' + kernelpca_name
 model_name = model_record_path + method_name + '_' + model_name
-reference_model_name = model_record_path + method_name + '_' + reference_model_name
 
 data, label = handle_data.loadTrainData(file_name)
 
@@ -146,79 +121,59 @@ new_data = handle_data.standarize_PCA_data(data, pca_or_not, kernelpca_or_not, n
 train_data = new_data
 
 
-single_input_size = train_data.shape[1]
-# transformed_input_size = 2 * single_input_size
 
 
-num_class = 1
-
-# x = tf.placeholder(tf.float32, [None, single_input_size])
-x = tf.placeholder(tf.float32, [None, 2, single_input_size])
-y_true = tf.placeholder(tf.float32, [None, 2, num_class])
-y_transformed_pred = tf.placeholder(tf.float32, [None, num_class])
-y_transformed_true = tf.placeholder(tf.float32, [None, num_class])
+reference_train_data,reference_train_label = handle_data.transform_data_to_compare_data(train_data, label, dicstart, diclength, mirror_type, positive_value, negative_value)
 
 
-# one hidden layer ------------------------------------------------
-hidden1 = tf.layers.dense(inputs=x, units=2*single_input_size, use_bias=True, activation=tf.nn.relu)
+reference_transformed_input_size = reference_train_data.shape[1]
+single_input_size = reference_transformed_input_size / 2
+reference_num_class = 1
+
+x_reference = tf.placeholder(tf.float32, [None, reference_transformed_input_size])
+y_true_reference = tf.placeholder(tf.float32, [None, reference_num_class])
+
+hidden1 = tf.layers.dense(inputs=x_reference, units=2*reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden2 = tf.layers.dense(inputs=hidden1, units=2*reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden3 = tf.layers.dense(inputs=hidden2, units=reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden4 = tf.layers.dense(inputs=hidden3, units=single_input_size, use_bias=True, activation=tf.nn.relu)
+hidden5 = tf.layers.dense(inputs=hidden4, units=2*reference_num_class, use_bias=True, activation=tf.nn.relu)
 # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
-y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmoid)
+y_pred = tf.layers.dense(inputs=hidden4, units=reference_num_class, activation=tf.nn.sigmoid)
 
+reference_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true_reference, logits=y_pred_reference)
 
-y_transformed = tf.math.sigmoid(10 * (y_pred[:,0,0] -  y_pred[:,1,0]))
-y_transformed = tf.reshape(y_transformed, shape=(-1,1))
-
-loss_1 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true, logits=y_pred)
-loss_2 = tf.square((y_transformed - y_transformed_true) * tf.math.log(y_transformed_pred / (1- y_transformed)))
-
-cost = tf.reduce_mean(loss)
-optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
+reference_cost = tf.reduce_mean(reference_loss)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(reference_cost)
 
 
 
-
-tf.add_to_collection('x', x)
-tf.add_to_collection('y_true', y_true)
+tf.add_to_collection('x_reference', x_reference)
+tf.add_to_collection('y_true_reference', y_true_reference)
 tf.add_to_collection('y_pred', y_pred)
-tf.add_to_collection('cost', cost)
+tf.add_to_collection('reference_cost', reference_cost)
 tf.add_to_collection('optimizer', optimizer)
 saver = tf.train.Saver()
 
 
-# create session and run the model
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.46)
-sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+
+sess = tf.Session()
 sess.run(tf.global_variables_initializer())
-for i in range(train_times):
-    # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
 
-    # train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
-    current_train_data, current_train_label, current_transformed_label, current_transformed_pred = handle_data.next_batch(train_data, train_label, group_index_list, reference_model_name=reference_model_name)
+feed_dict_train = {
+    x_reference       : reference_train_data,
+    y_true_reference  : reference_train_label
+}
 
-    current_train_data = np.array(current_train_data).reshape((-1,2,single_input_size))
-    current_train_label = np.array(current_train_label).reshape((-1,2,1))
-    current_transformed_label = np.array(current_transformed_label).reshape((-1,1))
-    current_transformed_pred = np.array(current_transformed_pred).reshape((-1,1))
-    feed_dict_train = {
-        x                   : current_train_data,
-        y_true              : current_train_label,
-        y_transformed_true  : current_transformed_label,
-        y_transformed_pred  : current_transformed_pred
-
-    }
-
-    cost_val, true_label, pred_label, opt_obj = sess.run( [cost, y_true, y_pred,
-        optimizer], feed_dict=feed_dict_train )
-    if (i % 1000) == 0 :
-        print('epoch: {0} cost = {1}'.format(i,cost_val))
-#             print(pred_label)
-#             print(true_label)
-# print(pred_label)
+for i in range(2500):
+    reference_cost_val, reference_true_label, reference_pred_label, opt_obj = sess.run( [reference_cost, y_true_reference, y_pred_reference, optimizer], feed_dict=feed_dict_train )
+    if (i % 100) == 0 :
+        print('epoch: {0} cost = {1}'.format(i,reference_cost_val))
 
 
 finish = clock()
-
 saver.save(sess, model_name)
+
 running_time = finish-start
 print('running time is {0}'.format(running_time))
 

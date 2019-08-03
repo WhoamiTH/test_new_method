@@ -1,9 +1,10 @@
+#@title predict_test
+# predict test head
 import numpy as np
 import random
-import handle_data
 import sklearn.metrics as skmet
 import time
-
+import handle_data
 # transform the labels to the safe mode
 def transform_labels(label, group_index_list, top_number):
     transformed_labels = []
@@ -205,3 +206,5 @@ def cal_average(all_group_top_precision, all_group_recall, all_group_fscore, all
     # record.write("the earn rate is {0}\n".format(earn_rate))
     # record.write("the average group top exact accuracy is {0}\n".format(all_group_top_exact_accuracy))
     # record.write("the average group accuracy is {0}\n".format(all_group_accuracy))
+
+# predict test functions ending 

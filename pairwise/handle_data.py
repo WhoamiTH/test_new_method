@@ -1,3 +1,5 @@
+#@title handle_data
+# handle data head
 import numpy as np
 import random
 import sklearn.preprocessing as skpre
@@ -6,6 +8,9 @@ from sklearn.decomposition import KernelPCA
 from sklearn.externals import joblib
 import pandas as pd
 
+
+
+# handle data function begining
 
 def loadTrainData(file_name):
     file_data = pd.read_csv(file_name)
@@ -35,6 +40,117 @@ def loadTestData(file_name):
     data = pd.DataFrame(data)
     return file_data, data
 
+def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_length=1, reference_model_name):
+    x_examples = []
+    y_examples = []
+    t_examples = []
+    p_examples = []
+    # print(train_data) 
+    # print(group_index_list)
+    group_list_length = len(group_index_list)
+    # print(train_data.shape)
+
+    # for i in range(batch_size):
+    group_idx = random.randint(0, group_list_length-1)
+    group_index = group_index_list[group_idx]
+    # print(group_index)
+
+    current_group_data = train_data[group_index]
+    current_group_label = train_label[group_index]
+    
+    posi_or_nega = random.randint(0, 1)
+    data_index = random.sample(group_index, 2)
+    first_data_idx = data_index[0]
+    first_data = current_group_data[first_data_idx : first_data_idx + seq_length]
+    first_label = current_group_label[first_data_idx : first_data_idx + seq_length]
+    second_data_idx = data_index[0]
+    second_data = current_group_data[second_data_idx : second_data_idx + seq_length]
+    second_label = current_group_label[second_data_idx : second_data_idx + seq_length]
+
+    if first_label > second_label:
+        positive_data = first_data
+        negative_data = second_data
+    else:
+        positive_data = second_data
+        negative_data = first_data
+
+
+    print(reference_model_name+'/my_model.meta')
+    print(reference_model_name)
+    saver = tf.train.import_meta_graph(reference_model_name+'/my_model.meta')
+    saver.restore(sess, tf.train.latest_checkpoint(reference_model_name))
+
+    # Load the model components
+    x_reference         = tf.get_collection('x_reference')[0]
+    y_true_reference    = tf.get_collection('y_true_reference')[0]
+    y_pred              = tf.get_collection('y_pred')[0]
+    reference_cost      = tf.get_collection('reference_cost')[0]
+    optimizer           = tf.get_collection('optimizer')[0]
+
+
+    if posi_or_nega > 0:
+        x_examples.append(positive_data)
+        y_examples.append([1])
+        x_examples.append(negative_data)
+        y_examples.append([0])
+        t_examples.append([1])
+
+        compare_data = data_extend(positive_data, negative_data)
+        y_pred_value = sess.run(y_pred, feed_dict={x_reference: compare_data})
+        p_examples.append(y_pred_value)
+    else:
+        
+        x_examples.append(negative_data)
+        y_examples.append([0])
+        x_examples.append(positive_data)
+        y_examples.append([1])
+        t_examples.append([0])
+        compare_data = data_extend(positive_data, negative_data)
+        y_pred_value = sess.run(y_pred, feed_dict={x_reference: compare_data})
+        p_examples.append(y_pred_value)
+    return x_examples, y_examples, t_examples, p_examples
+
+
+# def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_length=1):
+#     x_examples = []
+#     y_examples = []
+#     t_examples = []
+#     # print(train_data) 
+#     # print(group_index_list)
+#     group_list_length = len(group_index_list)
+#     # print(train_data.shape)
+
+#     # for i in range(batch_size):
+#     group_idx = random.randint(0, group_list_length-1)
+#     group_index = group_index_list[group_idx]
+#     # print(group_index)
+
+#     current_group_data = train_data[group_index]
+#     current_group_label = train_label[group_index]
+
+#     positive_data, negative_data = divide_data(current_group_data, current_group_label)
+#     positive_length = positive_data.shape[0]
+#     negative_length = negative_data.shape[0]
+    
+#     posi_or_nega = random.randint(0, 1)
+#     if posi_or_nega > 0:
+#         positive_idx = random.randint(0, positive_length - seq_length)
+#         x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
+#         y_examples.append([1])
+#         negative_idx = random.randint(0, negative_length - seq_length)
+#         x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
+#         y_examples.append([0])
+#         t_examples.append([1])
+#     else:
+#         negative_idx = random.randint(0, negative_length - seq_length)
+#         x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
+#         y_examples.append([0])
+#         positive_idx = random.randint(0, positive_length - seq_length)
+#         x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
+#         y_examples.append([1])
+#         t_examples.append([0])
+#     return x_examples, y_examples, t_examples
+
 
 def group(Data):
     group_index_list = []
@@ -42,7 +158,6 @@ def group(Data):
     for num, group in group_data:
         group_index_list.append(group.index.tolist())
     return group_index_list
-
 
 def data_extend(Data_1, Data_2):
     m = list(Data_1)
@@ -106,6 +221,9 @@ def exchange(test_y):
     return rank_ty
 
 
+
+
+
 def generate_primal_train_data(Data,Label,Ds,Dl,num_of_train):
     # train_index_start = random.randint(0,len(Ds)-num_of_train)
     train_index_start = 0
@@ -115,6 +233,47 @@ def generate_primal_train_data(Data,Label,Ds,Dl,num_of_train):
     train_y = Label[front:end]
     return train_index_start,train_x,train_y
 
+
+def transform_data_to_test_form_data(test_data, reference_data):
+    temd = []
+    length_test_data = len(test_data)
+    reference_data_list = list(reference_data)
+    reference_samples = random.sample(reference_data_list, length_test_data)
+    reference_samples = np.array(reference_samples)
+    transformed_test_data = np.hstack((test_data, reference_samples))
+    return transformed_test_data
+
+
+
+
+def handleData_extend(Data_pre, Data_pos, Label_pre, Label_pos):
+    temd = []
+    teml = []
+    length_pre = len(Data_pre)
+    length_pos = len(Data_pos)
+    for j in range(length_pre):
+        for t in range(length_pos):
+            temd.append(data_extend(Data_pre[j], Data_pos[t]))    
+    teml = np.zeros((length_pre*length_pos,4))
+    if Label_pre == 1:
+        teml[:,0] = 1
+        teml[:,1] = 0
+    else:
+        teml[:,0] = 0
+        teml[:,1] = 1
+    if Label_pos == 1:
+        teml[:,2] = 1
+        teml[:,3] = 0
+    else:
+        teml[:,2] = 0
+        teml[:,3] = 1
+    return temd, teml
+
+def data_extend(Data_1, Data_2):
+    m = list(Data_1)
+    n = list(Data_2)
+    return m + n
+
 def handleData_extend_mirror(Data, Label, positive_value, negative_value):
     temd = []
     teml = []
@@ -122,14 +281,14 @@ def handleData_extend_mirror(Data, Label, positive_value, negative_value):
     for j in range(length):
         for t in range(length):
             if j != t:
-                if Label[j] != Label[t]:
-                    temd.append(data_extend(Data[j], Data[t]))
-                    if Label[j] > Label[t]:
-                        # teml.append([-1])
-                        teml.append([negative_value])
-                    else:
-                        teml.append([positive_value])
+                temd.append(data_extend(Data[j], Data[t]))
+                if Label[j] > Label[t]:
+                    # teml.append([-1])
+                    teml.append([negative_value])
+                else:
+                    teml.append([positive_value])
     return temd, teml
+
 
 def handleData_extend_not_mirror(Data, Label, positive_value, negative_value):
     temd = []
@@ -137,34 +296,86 @@ def handleData_extend_not_mirror(Data, Label, positive_value, negative_value):
     length = len(Data)
     for j in range(length):
         for t in range(j+1,length):
-            if Label[j] != Label[t]:
-                temd.append(data_extend(Data[j], Data[t]))
-                if Label[j] > Label[t]:
-                    teml.append([negative_value])
-                else:
-                    teml.append([positive_value])
+            temd.append(data_extend(Data[j], Data[t]))
+            if Label[j] > Label[t]:
+                teml.append([negative_value])
+            else:
+                teml.append([positive_value])
     return temd, teml
 
 
-
-def transform_data_to_compare_data(Data, Label, group_index_list, mirror_type, positive_value, negative_value):
+def transform_data_to_compare_data(Data, Label, Ds, Dl, mirror_type, positive_value, negative_value):
     tem_data = []
     tem_label = []
-    for group_index in group_index_list:
-        current_group_data = Data[group_index]
-        current_group_label = Label[group_index]
+    for group_index in range(len(Ds)):
+        group_start = Ds[group_index]
+        length = Dl[group_index]
+        current_group_data = Data[group_start:group_start+length,:]
+        current_group_label = Label[group_start:group_start+length]
         if mirror_type == 'mirror':
             temd, teml = handleData_extend_mirror(current_group_data, current_group_label, positive_value, negative_value)
         else:
             temd, teml = handleData_extend_not_mirror(current_group_data, current_group_label, positive_value, negative_value)
-        tem_data.extend(temd)
-        tem_label.extend(teml)
+        tem_data = tem_data + temd
+        tem_label = tem_label + teml
 
     data = np.array(tem_data)
     label = np.array(tem_label)
 
     return data, label
 
+def generate_batch_data(positive_data, negative_data, batch_size):
+    positive_length = positive_data.shape[0]
+    negative_length = negative_data.shape[0]
+
+    times = negative_length / positive_length
+    times = round(times)
+
+    if times>3 :
+        times = 3
+
+    # print(times)
+
+    positive_data_index = np.random.choice(positive_length, batch_size, replace=False)
+    negative_data_index = np.random.choice(negative_length, times*batch_size, replace=False)
+
+    current_positive_data = positive_data[positive_data_index]
+    current_negative_data = negative_data[negative_data_index]
+
+    train_data, train_label = transform_data_to_compare_data(current_positive_data, current_negative_data)
+    return train_data, train_label
+
+
+
+# def divide_data(Data, Label):
+#     length = Data.shape[0]
+#     positive = []
+#     negative = []
+#     for i in range(length):
+#         if Label[i] == 1:
+#             positive.append(Data[i])
+#         else:
+#             negative.append(Data[i])
+#     positive = np.array(positive)
+#     negative = np.array(negative)
+#     return positive, negative
+
+
+def divide_data(Data, Label):
+    # length = Data.shape[0]
+    # positive = []
+    # negative = []
+    # for i in range(length):
+    #     if Label[i] == 1:
+    #         positive.append(Data[i])
+    #     else:
+    #         negative.append(Data[i])
+    positive_index = np.where(Label == 1)
+    negative_index = np.where(Label == 0)
+
+    positive = Data[positive_index[0]]
+    negative = Data[negative_index[0]]
+    return positive, negative
 
 
 
@@ -268,3 +479,8 @@ def append_file(file_name):
 
 
 
+
+
+
+
+# handle data functions ending
