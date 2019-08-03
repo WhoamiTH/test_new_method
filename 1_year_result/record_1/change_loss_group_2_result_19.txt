@@ -1,0 +1,4 @@
+the AUC is 0.766624579124579
+the Fscore is 0.6507936507936507
+the average group top precision is 0.6833333333333333
+the average group recall is 0.6212121212121212

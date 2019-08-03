@@ -9,6 +9,8 @@ import re
 import pandas as pd
 import tensorflow as tf
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
 def set_para():
     global train_file_name
@@ -122,7 +124,11 @@ for i in test_data:
     transformed_test_data.append([list(i), list(i)])
 test_data = np.array(transformed_test_data)
 
-sess = tf.Session()
+
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.46)
+sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+
+# sess = tf.Session()
 
 # Load the trained model from the directory "./model"
 
@@ -150,6 +156,7 @@ optimizer = tf.get_collection('optimizer')[0]
 
 # current_test_data = handle_data.transform_data_to_test_form_data(test_data, negative_data)
 # general_results = sess.run(y_pred, feed_dict={x: current_test_data})
+
 general_results = sess.run(y_pred, feed_dict={x: test_data})
 print(general_results)
 general_pred_results = general_results[:,0].reshape(-1,1)
