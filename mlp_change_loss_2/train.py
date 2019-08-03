@@ -97,6 +97,9 @@ negative_value = -1
 threshold_value = 0
 winner_number = 3
 
+
+train_times = 15000
+
 # ----------------------------------set parameters---------------------------------------
 set_para()
 
@@ -203,6 +206,7 @@ loss_2 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[1], logits=y_pred
 
 loss = loss_1 + loss_2
 
+
 # print(loss)
 
 cost = tf.reduce_mean(loss)
@@ -228,7 +232,7 @@ sess.run(tf.global_variables_initializer())
 #     y_true    : train_label
 # }
 
-for i in range(15000):
+for i in range(train_tiems * positive_data.shape[0]):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
     train_data, train_label = handle_data.next_batch(positive_data, negative_data)
     feed_dict_train = {
