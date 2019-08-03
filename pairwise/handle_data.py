@@ -84,7 +84,7 @@ def next_batch(train_data, train_label, group_index_list, reference_model_name,
     # Load the model components
     x_reference         = tf.get_collection('x_reference')[0]
     y_true_reference    = tf.get_collection('y_true_reference')[0]
-    y_pred              = tf.get_collection('y_pred')[0]
+    y_pred              = tf.get_collection('y_pred_reference')[0]
     reference_cost      = tf.get_collection('reference_cost')[0]
     optimizer           = tf.get_collection('optimizer')[0]
 

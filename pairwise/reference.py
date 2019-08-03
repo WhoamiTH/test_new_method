@@ -140,7 +140,7 @@ hidden3 = tf.layers.dense(inputs=hidden2, units=reference_transformed_input_size
 hidden4 = tf.layers.dense(inputs=hidden3, units=single_input_size, use_bias=True, activation=tf.nn.relu)
 hidden5 = tf.layers.dense(inputs=hidden4, units=2*reference_num_class, use_bias=True, activation=tf.nn.relu)
 # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
-y_pred = tf.layers.dense(inputs=hidden4, units=reference_num_class, activation=tf.nn.sigmoid)
+y_pred_reference = tf.layers.dense(inputs=hidden4, units=reference_num_class, activation=tf.nn.sigmoid)
 
 reference_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true_reference, logits=y_pred_reference)
 
@@ -151,7 +151,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(reference_cost
 
 tf.add_to_collection('x_reference', x_reference)
 tf.add_to_collection('y_true_reference', y_true_reference)
-tf.add_to_collection('y_pred', y_pred)
+tf.add_to_collection('y_pred_reference', y_pred_reference)
 tf.add_to_collection('reference_cost', reference_cost)
 tf.add_to_collection('optimizer', optimizer)
 saver = tf.train.Saver()
