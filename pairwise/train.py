@@ -136,7 +136,50 @@ data = data.astype(np.float64)
 
 start = clock()
 new_data = handle_data.standarize_PCA_data(data, pca_or_not, kernelpca_or_not, num_of_components, scaler_name, pca_name, kernelpca_name)
-train_data,train_label= handle_data.transform_data_to_compare_data(new_data, label, group_index_list, mirror_type, positive_value, negative_value)
+
+
+
+
+
+reference_train_data,reference_train_label = transform_data_to_compare_data(new_data, label, dicstart, diclength, mirror_type, positive_value, negative_value)
+
+
+reference_transformed_input_size = reference_train_data.shape[1]
+reference_num_class = 1
+
+x_reference = tf.placeholder(tf.float32, [None, reference_transformed_input_size])
+y_true_reference = tf.placeholder(tf.float32, [None, reference_num_class])
+
+hidden1 = tf.layers.dense(inputs=x_reference, units=2*reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden2 = tf.layers.dense(inputs=hidden1, units=2*transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden3 = tf.layers.dense(inputs=hidden2, units=transformed_input_size, use_bias=True, activation=tf.nn.relu)
+hidden4 = tf.layers.dense(inputs=hidden3, units=single_input_size, use_bias=True, activation=tf.nn.relu)
+hidden5 = tf.layers.dense(inputs=hidden4, units=2*num_class, use_bias=True, activation=tf.nn.relu)
+# y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
+y_pred = tf.layers.dense(inputs=hidden4, units=reference_num_class, activation=tf.nn.sigmoid)
+
+reference_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true_reference, logits=y_pred_reference)
+
+
+
+
+reference_cost = tf.reduce_mean(reference_loss)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(reference_cost)
+
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
+
+feed_dict_train = {
+    x_reference       : reference_train_data,
+    y_true_reference  : reference_train_label
+}
+
+
+for i in range(2500):
+    reference_cost_val, reference_true_label, reference_pred_label, opt_obj = sess.run( [reference_cost, y_true_reference, y_pred_reference, optimizer], feed_dict=feed_dict_train )
+    if (i % 100) == 0 :
+        print('epoch: {0} cost = {1}'.format(i,reference_cost_val))
+
 model,training_time = train_model(train_data, train_label)
 finish = clock()
 joblib.dump(model, model_name)
@@ -144,3 +187,14 @@ joblib.dump(model, model_name)
 running_time = finish-start
 print(model)
 print('running time is {0}'.format(running_time))
+
+
+
+
+
+
+
+
+
+
+
