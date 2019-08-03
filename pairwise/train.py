@@ -172,6 +172,8 @@ y_transformed = tf.reshape(y_transformed, shape=(-1,1))
 loss_1 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true, logits=y_pred)
 loss_2 = tf.square((y_transformed - y_transformed_true) * tf.math.log(y_transformed_pred / (1- y_transformed)))
 
+loss = loss_1 + loss_2
+
 cost = tf.reduce_mean(loss)
 optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
 
