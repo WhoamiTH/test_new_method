@@ -119,6 +119,8 @@ negative_value = -1
 threshold_value = 0
 winner_number = 3
 
+train_times = 50000
+
 # ----------------------------------set parameters---------------------------------------
 set_para()
 
