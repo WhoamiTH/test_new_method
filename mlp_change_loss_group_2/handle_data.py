@@ -55,7 +55,8 @@ def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_leng
     current_group_label = train_label[group_index]
 
     positive_data, negative_data = divide_data(current_group_data, current_group_label)
-
+    positive_length = positive_data.shape[0]
+    negative_length = negative_data.shape[0]
     
     posi_or_nega = random.randint(0, 1)
     if posi_or_nega > 0:
