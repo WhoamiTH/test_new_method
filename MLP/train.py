@@ -151,9 +151,9 @@ y_true = tf.placeholder(tf.float32, [None, num_class])
 
 
 # one hidden layer ------------------------------------------------
-# hidden1 = tf.layers.dense(inputs=x, units=2*single_input_size, use_bias=True, activation=tf.nn.relu)
-# # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
-# y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmoid)
+hidden1 = tf.layers.dense(inputs=x, units=2*single_input_size, use_bias=True, activation=tf.nn.relu)
+# y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
+y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmoid)
 
 # two hidden layer ------------------------------------------------
 # hidden1 = tf.layers.dense(inputs=x, units=2*transformed_input_size, use_bias=True, activation=tf.nn.sigmoid)
@@ -189,15 +189,15 @@ y_true = tf.placeholder(tf.float32, [None, num_class])
 # y_pred = tf.layers.dense(inputs=hidden4, units=num_class, activation=tf.nn.sigmoid)
 
 # 8 hidden layers -----------------------------------------------------------
-hidden1 = tf.layers.dense(inputs=x, units=4*transformed_input_size, use_bias=True, activation=tf.nn.relu)
-hidden2 = tf.layers.dense(inputs=hidden1, units=3*transformed_input_size, use_bias=True, activation=tf.nn.relu)
-hidden3 = tf.layers.dense(inputs=hidden2, units=2*transformed_input_size, use_bias=True, activation=tf.nn.relu)
-hidden4 = tf.layers.dense(inputs=hidden3, units=transformed_input_size, use_bias=True, activation=tf.nn.relu)
-hidden5 = tf.layers.dense(inputs=hidden4, units=single_input_size, use_bias=True, activation=tf.nn.relu)
-hidden6 = tf.layers.dense(inputs=hidden5, units=4*num_class, use_bias=True, activation=tf.nn.relu)
-hidden7 = tf.layers.dense(inputs=hidden6, units=2*num_class, use_bias=True, activation=tf.nn.relu)
-# y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
-y_pred = tf.layers.dense(inputs=hidden7, units=num_class, activation=tf.nn.sigmoid)
+# hidden1 = tf.layers.dense(inputs=x, units=4*transformed_input_size, use_bias=True, activation=tf.nn.relu)
+# hidden2 = tf.layers.dense(inputs=hidden1, units=3*transformed_input_size, use_bias=True, activation=tf.nn.relu)
+# hidden3 = tf.layers.dense(inputs=hidden2, units=2*transformed_input_size, use_bias=True, activation=tf.nn.relu)
+# hidden4 = tf.layers.dense(inputs=hidden3, units=transformed_input_size, use_bias=True, activation=tf.nn.relu)
+# hidden5 = tf.layers.dense(inputs=hidden4, units=single_input_size, use_bias=True, activation=tf.nn.relu)
+# hidden6 = tf.layers.dense(inputs=hidden5, units=4*num_class, use_bias=True, activation=tf.nn.relu)
+# hidden7 = tf.layers.dense(inputs=hidden6, units=2*num_class, use_bias=True, activation=tf.nn.relu)
+# # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
+# y_pred = tf.layers.dense(inputs=hidden7, units=num_class, activation=tf.nn.sigmoid)
 
 
 
