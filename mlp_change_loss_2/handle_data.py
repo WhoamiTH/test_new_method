@@ -51,9 +51,11 @@ def next_batch(positive_data, negative_data, batch_size=2, seq_length=1):
     posi_or_nega = random.randint(0, 1)
     if posi_or_nega > 0:
         positive_idx = random.randint(0, positive_length - seq_length)
+        print(positive_idx)
         x_examples.append(positive_data[positive_idx : positive_idx + seq_length])
         y_examples.append([1])
         negative_idx = random.randint(0, negative_length - seq_length)
+        print(negative_idx)
         x_examples.append(negative_data[negative_idx : negative_idx + seq_length])
         y_examples.append([0])
     else:
