@@ -243,15 +243,15 @@ for i in range(train_times):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
 
     # train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
-    train_data, train_label, transformed_label = handle_data.next_batch(train_data, train_label, group_index_list)
+    current_train_data, current_train_label, current_transformed_label = handle_data.next_batch(train_data, train_label, group_index_list)
 
     train_data = np.array(train_data).reshape((-1,2,single_input_size))
     train_label = np.array(train_label).reshape((-1,2,1))
     transformed_label = np.array(transformed_label).reshape((-1,1))
     feed_dict_train = {
-        x                   : train_data,
-        y_true              : train_label,
-        y_transformed_true  : transformed_label
+        x                   : current_train_data,
+        y_true              : current_train_label,
+        y_transformed_true  : current_transformed_label
 
     }
 
