@@ -115,6 +115,15 @@ start = clock()
 test_data = handle_data.transform_data_by_standarize_pca(test_data, scaler_name, pca_name, kernelpca_name)
 
 
+# transform_test_data
+test_data = list(test_data)
+transformed_test_data = []
+for i in test_data:
+    transformed_test_data.append([list(i), list(i)])
+test_data = np.array(transformed_test_data)
+
+
+
 sess = tf.Session()
 
 # Load the trained model from the directory "./model"

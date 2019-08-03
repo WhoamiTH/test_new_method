@@ -98,7 +98,7 @@ threshold_value = 0
 winner_number = 3
 
 
-train_times = 15000
+train_times = 50000
 
 # ----------------------------------set parameters---------------------------------------
 set_para()
@@ -134,7 +134,7 @@ train_data = new_data
 batch_size = 50
 
 
-positive_data, negative_data = handle_data.divide_data(train_data, label)
+# positive_data, negative_data = handle_data.divide_data(train_data, train_label)
 
 # create LogisticRegression model
 
@@ -146,14 +146,37 @@ single_input_size = train_data.shape[1]
 num_class = 1
 
 # x = tf.placeholder(tf.float32, [None, single_input_size])
-x = tf.placeholder(tf.float32, [None, single_input_size])
-y_true = tf.placeholder(tf.float32, [None, num_class])
+x = tf.placeholder(tf.float32, [None, 2, single_input_size])
+y_true = tf.placeholder(tf.float32, [None, 2, num_class])
+y_transformed_true = tf.placeholder(tf.float32, [None, num_class])
 
 
 # one hidden layer ------------------------------------------------
 hidden1 = tf.layers.dense(inputs=x, units=2*single_input_size, use_bias=True, activation=tf.nn.relu)
 # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
 y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmoid)
+
+
+y_transformed = tf.math.sigmoid(10 * (y_pred[:,0,0] -  y_pred[:,1,0]))
+y_transformed = tf.reshape(y_transformed, shape=(-1,1))
+
+
+# loss_1 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[:,0,0], logits=y_pred[:,0,0])
+# loss_2 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[:,1,0], logits=y_pred[:,1,0])
+
+
+loss_1 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true, logits=y_pred)
+
+loss_2 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_transformed_true, logits=y_transformed)
+
+loss = loss_1 + loss_2
+
+
+# print(loss)
+
+cost = tf.reduce_mean(loss)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
+
 
 # two hidden layer ------------------------------------------------
 # hidden1 = tf.layers.dense(inputs=x, units=2*transformed_input_size, use_bias=True, activation=tf.nn.sigmoid)
@@ -199,18 +222,6 @@ y_pred = tf.layers.dense(inputs=hidden1, units=num_class, activation=tf.nn.sigmo
 # # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
 # y_pred = tf.layers.dense(inputs=hidden7, units=num_class, activation=tf.nn.sigmoid)
 
-loss_1 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[0], logits=y_pred[0])
-loss_2 = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true[1], logits=y_pred[1])
-
-# loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true, logits=y_pred)
-
-loss = loss_1 + loss_2
-
-
-# print(loss)
-
-cost = tf.reduce_mean(loss)
-optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(cost)
 
 
 
@@ -232,20 +243,26 @@ sess.run(tf.global_variables_initializer())
 #     y_true    : train_label
 # }
 
-for i in range(train_tiems * positive_data.shape[0]):
+for i in range(train_times):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
-    train_data, train_label = handle_data.next_batch(positive_data, negative_data)
+    train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
+    train_data = np.array(train_data).reshape((-1,2,single_input_size))
+    train_label = np.array(train_label).reshape((-1,2,1))
+    transformed_label = np.array(transformed_label).reshape((-1,1))
     feed_dict_train = {
-        x       : train_data,
-        y_true  : train_label
+        x                   : train_data,
+        y_true              : train_label,
+        y_transformed_true  : transformed_label
+
     }
 
-    cost_val, true_label, pred_label, opt_obj = sess.run( [cost, y_true, y_pred, optimizer], feed_dict=feed_dict_train )
-    if (i % 100) == 0 :
+    cost_val, true_label, pred_label, opt_obj = sess.run( [cost, y_true, y_pred,
+        optimizer], feed_dict=feed_dict_train )
+    if (i % 1000) == 0 :
         print('epoch: {0} cost = {1}'.format(i,cost_val))
 #             print(pred_label)
 #             print(true_label)
-print(pred_label)
+# print(pred_label)
 finish = clock()
 saver.save(sess, model_name)
 
