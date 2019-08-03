@@ -44,12 +44,14 @@ def next_batch(train_data, train_label, group_index_list, batch_size=2, seq_leng
     x_examples = []
     y_examples = []
     t_examples = []
-
+    print(train_data) 
+    # print(group_index_list)
     group_list_length = len(group_index_list)
 
     # for i in range(batch_size):
     group_idx = random.randint(0, group_list_length-1)
     group_index = group_index_list[group_idx]
+    print(group_index)
 
     current_group_data = train_data[group_index]
     current_group_label = train_label[group_index]
