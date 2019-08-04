@@ -199,7 +199,7 @@ for i in range(train_times):
     # train_data, train_label = handle_data.generate_batch_data(positive_data, negative_data, batch_size)
 
     # train_data, train_label, transformed_label = handle_data.next_batch(positive_data, negative_data)
-    current_train_data, current_train_label, current_transformed_label, current_transformed_pred = handle_data.next_batch(train_data, train_label, group_index_list, reference_model_name=reference_model_name)
+    current_train_data, current_train_label, current_transformed_label, current_transformed_pred = handle_data.next_batch(sess, train_data, train_label, group_index_list, reference_model_name=reference_model_name)
 
     current_train_data = np.array(current_train_data).reshape((-1,2,single_input_size))
     current_train_label = np.array(current_train_label).reshape((-1,2,1))

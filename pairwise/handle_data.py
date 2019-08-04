@@ -40,7 +40,7 @@ def loadTestData(file_name):
     data = pd.DataFrame(data)
     return file_data, data
 
-def next_batch(train_data, train_label, group_index_list, reference_model_name,
+def next_batch(sess, train_data, train_label, group_index_list, reference_model_name,
         batch_size=2, seq_length=1):
     x_examples = []
     y_examples = []
@@ -75,7 +75,7 @@ def next_batch(train_data, train_label, group_index_list, reference_model_name,
         positive_data = second_data
         negative_data = first_data
 
-    sess = tf.Session()
+    #sess = tf.Session()
 
     print(reference_model_name+'/my_model.meta')
     print(reference_model_name)

@@ -107,7 +107,8 @@ if pca_or_not:
     pca_name = model_record_path + method_name + '_' + pca_name
 if kernelpca_or_not:
     kernelpca_name = model_record_path  + method_name + '_' + kernelpca_name
-model_name = model_record_path + method_name + '_' + model_name
+model_id = method_name + '_' + model_name
+model_name = model_record_path + model_id
 
 data, label = handle_data.loadTrainData(file_name)
 
@@ -131,30 +132,32 @@ reference_transformed_input_size = reference_train_data.shape[1]
 single_input_size = reference_transformed_input_size / 2
 reference_num_class = 1
 
-x_reference = tf.placeholder(tf.float32, [None, reference_transformed_input_size])
-y_true_reference = tf.placeholder(tf.float32, [None, reference_num_class])
+with tf.Graph().as_default() as g:
+    with g.name_scope(model_id) as scope:
+        x_reference = tf.placeholder(tf.float32, [None, reference_transformed_input_size])
+        y_true_reference = tf.placeholder(tf.float32, [None, reference_num_class])
 
-hidden1 = tf.layers.dense(inputs=x_reference, units=2*reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
-hidden2 = tf.layers.dense(inputs=hidden1, units=2*reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
-hidden3 = tf.layers.dense(inputs=hidden2, units=reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
-hidden4 = tf.layers.dense(inputs=hidden3, units=single_input_size, use_bias=True, activation=tf.nn.relu)
-hidden5 = tf.layers.dense(inputs=hidden4, units=2*reference_num_class, use_bias=True, activation=tf.nn.relu)
-# y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
-y_pred_reference = tf.layers.dense(inputs=hidden4, units=reference_num_class, activation=tf.nn.sigmoid)
+        hidden1 = tf.layers.dense(inputs=x_reference, units=2*reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
+        hidden2 = tf.layers.dense(inputs=hidden1, units=2*reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
+        hidden3 = tf.layers.dense(inputs=hidden2, units=reference_transformed_input_size, use_bias=True, activation=tf.nn.relu)
+        hidden4 = tf.layers.dense(inputs=hidden3, units=single_input_size, use_bias=True, activation=tf.nn.relu)
+        hidden5 = tf.layers.dense(inputs=hidden4, units=2*reference_num_class, use_bias=True, activation=tf.nn.relu)
+        # y_pred = tf.layers.dense(inputs=hidden1, units=4, activation=tf.nn.sigmoid)
+        y_pred_reference = tf.layers.dense(inputs=hidden4, units=reference_num_class, activation=tf.nn.sigmoid)
 
-reference_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true_reference, logits=y_pred_reference)
+        reference_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=y_true_reference, logits=y_pred_reference)
 
-reference_cost = tf.reduce_mean(reference_loss)
-optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(reference_cost)
+        reference_cost = tf.reduce_mean(reference_loss)
+        optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(reference_cost)
 
 
 
-tf.add_to_collection('x_reference', x_reference)
-tf.add_to_collection('y_true_reference', y_true_reference)
-tf.add_to_collection('y_pred_reference', y_pred_reference)
-tf.add_to_collection('reference_cost', reference_cost)
-tf.add_to_collection('optimizer', optimizer)
-saver = tf.train.Saver()
+        tf.add_to_collection('x_reference', x_reference)
+        tf.add_to_collection('y_true_reference', y_true_reference)
+        tf.add_to_collection('y_pred_reference', y_pred_reference)
+        tf.add_to_collection('reference_cost', reference_cost)
+        tf.add_to_collection('optimizer', optimizer)
+        saver = tf.train.Saver()
 
 
 
