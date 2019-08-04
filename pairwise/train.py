@@ -143,6 +143,7 @@ group_index_list = handle_data.group(data)
 data = data.values
 data = data.astype(np.float64)
 
+train_label = label.astype(np.int)
 
 start = clock()
 new_data = handle_data.standarize_PCA_data(data, pca_or_not, kernelpca_or_not, num_of_components, scaler_name, pca_name, kernelpca_name)

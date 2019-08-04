@@ -7,7 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.decomposition import KernelPCA
 from sklearn.externals import joblib
 import pandas as pd
-
+import tensorflow as tf
 
 
 # handle data function begining
