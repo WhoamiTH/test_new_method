@@ -75,6 +75,7 @@ def next_batch(train_data, train_label, group_index_list, reference_model_name,
         positive_data = second_data
         negative_data = first_data
 
+    sess = tf.Session()
 
     print(reference_model_name+'/my_model.meta')
     print(reference_model_name)
