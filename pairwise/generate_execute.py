@@ -34,7 +34,7 @@ for record_number in range(1, total_record_number+1):
         pca_name
         model_name
         """
-        file.write('python train.py file_name=../1_year_data/GData_train_{0}.csv model_record_path=../1_year_result/model_{1}/ file_record_path=../1_year_result/record_{2}/ method_name={3} scaler_name=scaler_{4}.m pca=True pca_name=pca_{5}.m model_name=model_{6}/my_model reference_model_name=reference_model_{6}/my_model\n'.format(i, record_number, record_number, method_name, i, i, i))
+        file.write('python train.py file_name=../1_year_data/GData_train_{0}.csv model_record_path=../1_year_result/model_{1}/ file_record_path=../1_year_result/record_{2}/ method_name={3} scaler_name=scaler_{4}.m pca=True pca_name=pca_{5}.m model_name=model_{6}/my_model reference_model_name=reference_model_{6}\n'.format(i, record_number, record_number, method_name, i, i, i))
         """
         test parameter list:
         file_name
